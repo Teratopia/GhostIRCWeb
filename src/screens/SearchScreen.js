@@ -28,34 +28,31 @@ class SearchScreen extends Component {
     }
 
     render() {
-        return <Container fluid>
+        return <Container fluid 
+        //style={{height : '100%'}}
+        >
             <Row>
-
-            
-            <Col>
-roo
+            <Col style={{backgroundColor : 'blue'}}>
+                foo
             </Col>
+            <Col xs={10} fluid 
+            //style = {{height:"100%"}}
+            >
+                        <GoogleMapReact
+                        style={{height : '90vh'}}
+                        bootstrapURLKeys={{ key: 'AIzaSyB-N2bitfPMd84UXUTcAgIF0F4VICsWoGs' }}
+                        defaultCenter={{
+                            lat: 45.523208,
+                            lng: -122.689243
+                        }}
+                        defaultZoom={11}
+                        >
 
-            <Col xs={10} fluid style = {{height:"100vh", backgroundColor : 'blue'}}>
-                <div style={{height : '5%'}}/>
-            <div style={
-                //{width : '400px', height : '400px'}
-                {width : '100%', height : '90%'}
-                }>
-                    <GoogleMapReact
-                    bootstrapURLKeys={{ key: 'AIzaSyB-N2bitfPMd84UXUTcAgIF0F4VICsWoGs' }}
-                    defaultCenter={{
-                        lat: 45.523208,
-                        lng: -122.689243
-                    }}
-                    defaultZoom={11}
-                    ></GoogleMapReact>
-            </div>
-            <div style={{height : '5%'}}/>
+
+                        </GoogleMapReact>
             </Col>
-            
-            <Col>
-            bar
+            <Col style={{backgroundColor : 'blue'}}>
+                bar
             </Col>
             </Row>
         </Container>

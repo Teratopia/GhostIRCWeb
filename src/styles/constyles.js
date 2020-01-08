@@ -63,28 +63,33 @@ export default {
     genH2Text : {
         fontSize : '48px',
         fontWeight : '700',
+        textAlign : 'center'
     },
     genH3Text : {
         fontSize : '24px',
         fontWeight : '500',
+        textAlign : 'center'
         //color : colors.secondary,
         //textAlign : 'center'
     },
     genH4Text : {
         fontSize : '18px',
         fontWeight : '500',
+        textAlign : 'center'
         //color : colors.secondary,
         //textAlign : 'center'
     },
     genH5Text : {
         fontSize : '14px',
         fontWeight : '500',
+        textAlign : 'center'
         //color : colors.secondary,
         //textAlign : 'center'
     },
     genH6Text : {
         fontSize : '10px',
         fontWeight : '400',
+        textAlign : 'center'
         //color : colors.secondary,
         //textAlign : 'center'
     },

@@ -1,10 +1,11 @@
 import React, { Component, useImperativeHandle } from 'react';
 //import constyles from '../styles/constyles';
 //import colors from '../styles/colors';
-//import { Button, Row, Container, Col, Form } from 'react-bootstrap';
+import { Button, Row, Container, Col, Form } from 'react-bootstrap';
 import LoginScreen from './LoginScreen';
 import SearchScreen from './SearchScreen';
-
+import UniversalFooter from '../components/UniversalFooter';
+import UniversalHeader from '../components/UniversalHeader';
 
 
 class NavigationScreen extends Component {
@@ -40,23 +41,37 @@ class NavigationScreen extends Component {
     }
 
     render() {
-        switch(this.state.currentScreen) {
-            case 'SEARCH':
-                return <SearchScreen
-                    socket={this.props.socket}
-                    user={this.state.user}
-                    setUser={this.setUser}
-                    setCurrentScreen={this.setCurrentScreen}
-                    pnToken="test"
-                />
-            default:
-                return <LoginScreen
+        
+
+        if(this.state.currentScreen === 'LOGIN'){
+            return <LoginScreen
                     socket={this.props.socket}
                     setUser={this.setUser}
                     setCurrentScreen={this.setCurrentScreen}
                     pnToken="test"
                 />
         }
+
+        let mainView;
+        switch(this.state.currentScreen) {
+            case 'SEARCH':
+                mainView = <SearchScreen
+                    socket={this.props.socket}
+                    user={this.state.user}
+                    setUser={this.setUser}
+                    setCurrentScreen={this.setCurrentScreen}
+                    pnToken="test"
+                />
+        }
+
+        return <Container fluid style={{height:"100vh", backgroundColor : 'green'}}>
+            <UniversalHeader />
+            {mainView}
+            <UniversalFooter />
+        </Container>
+
+        
+
     };
 }
 
