@@ -23,7 +23,7 @@ class UniversalFooter extends Component {
                 <Col xs={5}>
 
                 </Col>
-                <Col style={constyles.genH5Text}>
+                <Col style={{...constyles.genH5Text, marginTop : '6px'}}>
                     Legal Lorem Ipsum
                 </Col>
                 <Col xs={5}>

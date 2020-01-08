@@ -89,8 +89,7 @@ export default {
     genH6Text : {
         fontSize : '10px',
         fontWeight : '400',
-        textAlign : 'center'
-        //color : colors.secondary,
         //textAlign : 'center'
+        //color : colors.secondary,
     },
 }

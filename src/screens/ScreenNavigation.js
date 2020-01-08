@@ -12,7 +12,8 @@ class NavigationScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentScreen: 'LOGIN',
+            currentScreen: 'SEARCH',
+            //currentScreen: 'LOGIN',
             user: null,
             pnToken: 'test',
         }
@@ -60,12 +61,15 @@ class NavigationScreen extends Component {
                     user={this.state.user}
                     setUser={this.setUser}
                     setCurrentScreen={this.setCurrentScreen}
+                    currentScreen={this.state.currentScreen}
                     pnToken="test"
                 />
         }
 
-        return <Container fluid style={{height:"100vh", backgroundColor : 'green'}}>
-            <UniversalHeader />
+        return <Container fluid style={{height:"100vh"}}>
+            <UniversalHeader 
+                currentScreen={this.state.currentScreen}
+            />
             {mainView}
             <UniversalFooter />
         </Container>

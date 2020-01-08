@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import './App.css';
-import ScreenNavigation from './screens/ScreenNavigation';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import io from "socket.io-client";
 
-
+import ScreenNavigation from './screens/ScreenNavigation';
 
 class App extends Component {
   constructor() {
@@ -25,7 +24,10 @@ class App extends Component {
     
   }
   render(){
-    return <ScreenNavigation socket={this.socket}/>
+      return <ScreenNavigation socket={this.socket}/>
+
+
+
     /*
     return <div className="App">
       <header className="App-header">

@@ -3,14 +3,15 @@ import React, { Component } from 'react';
 //import colors from '../styles/colors';
 import { Button, Row, Container, Col, Form } from 'react-bootstrap';
 import GoogleMapReact from 'google-map-react';
-
+import { faGhost } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
 class SearchScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            viewSideView : false
         }
     }
 
@@ -32,10 +33,13 @@ class SearchScreen extends Component {
         //style={{height : '100%'}}
         >
             <Row>
-            <Col style={{backgroundColor : 'blue'}}>
-                foo
-            </Col>
-            <Col xs={10} fluid 
+            {this.state.viewSideView ?
+                <Col style={{backgroundColor : 'blue'}}>
+                    foo
+                </Col>
+            :null}
+            
+            <Col xs={12} 
             //style = {{height:"100%"}}
             >
                         <GoogleMapReact
@@ -45,14 +49,17 @@ class SearchScreen extends Component {
                             lat: 45.523208,
                             lng: -122.689243
                         }}
-                        defaultZoom={11}
+                        defaultZoom={16}
                         >
-
+                            <FontAwesomeIcon 
+                                icon={faGhost} 
+                                color="black"
+                                lat={45.523228}
+                                lng={-122.689243}
+                                size="2x"
+                            />
 
                         </GoogleMapReact>
-            </Col>
-            <Col style={{backgroundColor : 'blue'}}>
-                bar
             </Col>
             </Row>
         </Container>
