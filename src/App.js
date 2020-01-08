@@ -1,10 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {Component} from 'react';
 import './App.css';
+import ScreenNavigation from './screens/ScreenNavigation';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import io from "socket.io-client";
 
-function App() {
-  return (
-    <div className="App">
+
+
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+
+    };
+    
+    this.socket = io('http://127.0.0.1:1212', {jsonp : false});
+    this.socket.on('connect', () => {
+      console.log('CONNECTION SUCCESSFUL');
+      });
+      
+    
+  }
+
+  componentDidMount() {
+    
+  }
+  render(){
+    return <ScreenNavigation socket={this.socket}/>
+    /*
+    return <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
@@ -20,7 +43,10 @@ function App() {
         </a>
       </header>
     </div>
-  );
+    */
+  };
+
+
 }
 
 export default App;
