@@ -4,6 +4,7 @@ import React, { Component, useImperativeHandle } from 'react';
 import { Button, Row, Container, Col, Form } from 'react-bootstrap';
 import LoginScreen from './LoginScreen';
 import SearchScreen from './SearchScreen';
+import GhostsScreen from './GhostsScreen';
 import UniversalFooter from '../components/UniversalFooter';
 import UniversalHeader from '../components/UniversalHeader';
 
@@ -12,8 +13,8 @@ class NavigationScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentScreen: 'SEARCH',
-            //currentScreen: 'LOGIN',
+            //currentScreen: 'GHOSTS',
+            currentScreen: 'LOGIN',
             user: null,
             pnToken: 'test',
         }
@@ -25,8 +26,13 @@ class NavigationScreen extends Component {
 
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps, prevState) {
         console.log('NavigationScreen this.state = ', this.state);
+        console.log('NavigationScreen prevState = ', prevState);
+        if(prevState.currentScreen !== this.state.currentScreen){
+            console.log('componentDidUpdate if');
+            this.render();
+        }
     }
 
     setUser(user){
@@ -42,8 +48,6 @@ class NavigationScreen extends Component {
     }
 
     render() {
-        
-
         if(this.state.currentScreen === 'LOGIN'){
             return <LoginScreen
                     socket={this.props.socket}
@@ -56,6 +60,7 @@ class NavigationScreen extends Component {
         let mainView;
         switch(this.state.currentScreen) {
             case 'SEARCH':
+                console.log('render 1');
                 mainView = <SearchScreen
                     socket={this.props.socket}
                     user={this.state.user}
@@ -64,11 +69,24 @@ class NavigationScreen extends Component {
                     currentScreen={this.state.currentScreen}
                     pnToken="test"
                 />
+                break;
+            case 'GHOSTS':
+                console.log('render 2');
+                mainView = <GhostsScreen
+                    socket={this.props.socket}
+                    user={this.state.user}
+                    setUser={this.setUser}
+                    setCurrentScreen={this.setCurrentScreen}
+                    currentScreen={this.state.currentScreen}
+                    pnToken="test"
+                />
         }
+        
 
         return <Container fluid style={{height:"100vh"}}>
             <UniversalHeader 
                 currentScreen={this.state.currentScreen}
+                setCurrentScreen={this.setCurrentScreen}
             />
             {mainView}
             <UniversalFooter />

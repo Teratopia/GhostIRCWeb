@@ -1,9 +1,9 @@
-import React, { Component, useImperativeHandle } from 'react';
+import React, { Component } from 'react';
 import constyles from '../styles/constyles';
 import colors from '../styles/colors';
 import { Button, Row, Container, Col, Form } from 'react-bootstrap';
 //import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMap, faGhost, faEnvelope, faUserCircle, faCog } from '@fortawesome/free-solid-svg-icons'
+import { faMap, faGhost, faUserCircle, faCog } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
@@ -21,12 +21,14 @@ class UniversalHeader extends Component {
     }
 
     render() {
-        return <Container fluid style={{height : '5vh'}}>
+        return <Container fluid style={{height : '5vh', borderBottom : '1px solid '+colors.secondary}}>
             <Row>
                 <Col xs={2} style={{justifyContent : 'center', alignItems : 'center'}}>
                     <Row style={{marginTop : '3px'}}>
 
-                        <Col>
+                        <Col 
+                            style={{cursor: 'pointer'}}
+                            onClick={()=>{this.props.setCurrentScreen('SEARCH')}}>
                             <Row>
                             <FontAwesomeIcon 
                                 style={{margin : 'auto', justifyContent : 'center'}}
@@ -38,7 +40,9 @@ class UniversalHeader extends Component {
                             MAP
                             </Row>
                         </Col>
-                        <Col>
+                        <Col 
+                            style={{cursor: 'pointer'}}
+                            onClick={()=>{this.props.setCurrentScreen('GHOSTS')}}>
                             <Row>
                             <FontAwesomeIcon 
                                 style={{margin : 'auto', justifyContent : 'center'}}
@@ -50,18 +54,24 @@ class UniversalHeader extends Component {
                             GHOSTS
                             </Row>
                         </Col>
+                        {
+/*
                         <Col>
                             <Row>
                             <FontAwesomeIcon 
                                 style={{margin : 'auto', justifyContent : 'center'}}
                                 icon={faEnvelope} 
-                                color={this.props.currentScreen === 'GHOSTS' ? colors.primary : 'black'}
+                                color={this.props.currentScreen === 'INBOX' ? colors.primary : 'black'}
                             /> 
                             </Row>
                             <Row style={{...constyles.genH6Text, textAlign : 'inherit', justifyContent : 'center'}}>
                             INBOX
                             </Row>
                         </Col>
+*/
+    }
+    <Col>
+    </Col>
 
                     </Row>
                 </Col>
@@ -80,7 +90,9 @@ class UniversalHeader extends Component {
                         <Col>
 
                         </Col>
-                        <Col>
+                        <Col
+                            style={{cursor: 'pointer'}}
+                        >
                             <Row>
                             <FontAwesomeIcon 
                                 style={{margin : 'auto', justifyContent : 'center'}}
@@ -92,7 +104,9 @@ class UniversalHeader extends Component {
                             PROFILE
                             </Row>
                         </Col>
-                        <Col>
+                        <Col
+                            style={{cursor: 'pointer'}}
+                        >
                             <Row>
                             <FontAwesomeIcon 
                                 style={{margin : 'auto', justifyContent : 'center'}}

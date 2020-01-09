@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import constyles from '../styles/constyles';
 import colors from '../styles/colors';
 import { Button, Row, Container, Col, Form } from 'react-bootstrap';
+import { faGhost } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
 class LoginScreen extends Component {
@@ -99,7 +101,16 @@ class LoginScreen extends Component {
         return <Container fluid={true} style={{ 'marginTop': '40px' }}>
             <Row>
                 <Col>
-                    <h1 style={constyles.genH1Text}>GhostIRC</h1>
+                <Row>
+                        <FontAwesomeIcon 
+                                style={{margin : 'auto', justifyContent : 'center'}}
+                                icon={faGhost} 
+                                color={colors.secondary}
+                            /> 
+                </Row>
+                <Row xs={12}>
+                    <h1 style={{...constyles.genH1Text, textAlign : 'center', margin : 'auto', justifyContent : 'center'}}>GhostIRC</h1>
+                </Row>
                 </Col>
             </Row>
             <Row>
