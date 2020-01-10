@@ -75,12 +75,14 @@ class LoginScreen extends Component {
     }
 
     submitButtonHandler() {
+        console.log('submitButtonHandler 1');
         if (this.state.email &&
             this.state.username &&
             this.state.password &&
             this.state.code &&
             this.state.password === this.state.confPassword &&
             this.state.code === this.state.confCode) {
+                console.log('submitButtonHandler 2');
             this.props.socket.emit('completeUserSignUp', {
                 email: this.state.email,
                 password: this.state.password,

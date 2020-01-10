@@ -5,6 +5,8 @@ import { Button, Row, Container, Col, Badge, Tabs, Tab, Card } from 'react-boots
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import GhostInteractionView from '../components/GhostInteractionView';
+import MyGhostsChatCardListView from '../components/MyGhostsChatCardListView';
+import GhostScreenGhostListView from '../components/GhostScreenGhostListView';
 
 class GhostsScreen extends Component {
     constructor(props) {
@@ -12,9 +14,22 @@ class GhostsScreen extends Component {
         this.state = {
             myGhosts : null,
             friendlyGhosts : null,
-            selectedGhost : null
+            selectedGhost : null,
+            routingChatCard : null,
+            responseRequestBeingHandled : null,
+            chatCards : null,
+            newResponseText: null,
+            currentChatCard: null,
+            chatCardHistory : []
         }
         this.setGhost = this.setGhost.bind(this);
+        this.setRoutingChatCard = this.setRoutingChatCard.bind(this);
+        this.confirmRoute = this.confirmRoute.bind(this);
+        this.jumpToCardHandler = this.jumpToCardHandler.bind(this);
+        this.setResponseRequestBeingHandled = this.setResponseRequestBeingHandled.bind(this);
+        this.submitNewCard = this.submitNewCard.bind(this);
+        this.postNewResponseRequest = this.postNewResponseRequest.bind(this);
+        this.removeResponseRequestBeingHandled = this.removeResponseRequestBeingHandled.bind(this);
     }
 
     componentDidMount() {
@@ -30,83 +45,192 @@ class GhostsScreen extends Component {
         this.props.socket.emit('getUserGhosts', {
             userId : this.props.user._id
         })
+        this.props.socket.on('getAllChatCardForGhostByGhostId', res => {
+            console.log('getAllChatCardForGhostByGhostId res = ', res);
+            if (res.success) {
+                console.log('getAllChatCardForGhostByGhostId success');
+                this.setState({
+                    chatCards: res.chatCards
+                });
+            }
+        });
+        //
+        this.props.socket.on('updateGhost', res => {
+            console.log('updateGhost res = ', res);
+            if (res.success) {
+                this.setState({selectedGhost : res.ghost});
+            } else {
+                console.log('update ghost error = ', res.message);
+            }
+        });
+        this.props.socket.on('updateChatCard', res => {
+            console.log('updateChatCard res = ', res);
+            if (res.success) {
+                let updateObj = {
+                    newResponseText: null,
+                    newChatCardText: null,
+                    currentChatCard: res.chatCard
+                };
+                if (this.state.chatCardHistory.length === 0){
+                    updateObj.chatCardHistory = [res.chatCard._id];
+                } else if(this.state.chatCardHistory.length > 1 && 
+                    this.state.chatCardHistory[this.state.chatCardHistory.length - 2] === res.chatCard._id){
+                    let clone = [...this.state.chatCardHistory];
+                    clone.splice(this.state.chatCardHistory.length -1, 1);
+                    updateObj.chatCardHistory = clone;
+                } else if(this.state.chatCardHistory[this.state.chatCardHistory.length - 1] !== res.chatCard._id) {
+                    console.log(' on updateChatCard if');
+                    updateObj.chatCardHistory = [...this.state.chatCardHistory, res.chatCard._id];
+                }
+                this.setState(updateObj);
+            } else {
+                console.log('updateChatCard error = ', res.message);
+            }
+        });
+
+        /*
+        this.props.socket.on('getAllChatCardForGhostByGhostId', res => {
+            console.log('getAllChatCardForGhostByGhostId res = ', res);
+            if (res.success) {
+                console.log('getAllChatCardForGhostByGhostId success');
+                //setAllGhostChatCards(res.chatCards);
+            }
+        });
+        */
+
+
+        if (this.props.ghost && this.props.ghost.baseChatCards && this.props.ghost.baseChatCards.length > 0) {
+            console.log('props.ghost.baseChatCards[Math.floor(Math.random() * (props.ghost.baseChatCards.length -1))] = ', this.props.ghost.baseChatCards[Math.floor(Math.random() * (this.props.ghost.baseChatCards.length - 1))]);
+            this.props.socket.emit('getChatCardById', {
+                chatCardId: this.props.ghost.baseChatCards[Math.floor(Math.random() * (this.props.ghost.baseChatCards.length - 1))]._id
+            });
+        }
+        //this.props.socket.emit('getAllChatCardForGhostByGhostId', {ghostId : this.props.ghost._id});
     }
 
-    setGhost(ghost){
-        this.setState({selectedGhost : ghost});
+    componentDidUpdate(prevProps, prevState){
+        console.log('ghostScreen prevProps = ', prevProps);
+        console.log('ghostScreen current Props = ', this.props);
+        console.log('ghostScreen prevState = ', prevState);
+        console.log('ghostScreen current State = ', this.state);
     }
 
     componentWillUnmount() {
         this.props.socket.removeListener('getUserGhosts');
+        this.props.socket.removeListener('getAllChatCardForGhostByGhostId');
+        this.props.socket.removeListener('updateGhost');
+        this.props.socket.removeListener('updateChatCard');
+    }
+
+    removeResponseRequestBeingHandled(){
+        this.setState({responseRequestBeingHandled : null})
+    }
+
+    setGhost(ghost){
+        console.log('setGhost ghost = ', ghost);
+        this.setState({
+            selectedGhost : ghost,
+            routingChatCard : null,
+            responseRequestBeingHandled : null,
+            chatCards : null,
+            newResponseText: null,
+            currentChatCard: null,
+            chatCardHistory : []
+        });
+
+        if (ghost && ghost.baseChatCards && ghost.baseChatCards.length > 0) {
+            console.log('setGhost if ');
+            console.log('ghost.baseChatCards[ Math.floor(Math.random() * (ghost.baseChatCards.length - 1))]._id = ', ghost.baseChatCards[ Math.floor(Math.random() * (ghost.baseChatCards.length - 1))]._id);
+            this.props.socket.emit('getChatCardById', {
+                chatCardId: ghost.baseChatCards[ Math.floor(Math.random() * (ghost.baseChatCards.length - 1))]._id
+            });
+        }
+        this.render();
+    }
+
+    setRoutingChatCard(chatCard){
+        if(this.state.routingChatCard === chatCard){
+            this.setState({routingChatCard : null});
+        } else {
+            this.setState({routingChatCard : chatCard});
+        }
+    }
+
+    jumpToCardHandler(){
+        if(this.state.routingChatCard){
+            this.props.socket.emit('getChatCardById', {
+                chatCardId : this.state.routingChatCard._id
+            });
+        }
+    }
+
+    setResponseRequestBeingHandled(response){
+        console.log('setResponseRequestBeingHandled response = ', response);
+        this.setState({responseRequestBeingHandled : response});
+    }
+
+    submitNewCard(text){
+        console.log('submitNewCard text = ', text);
+    }
+
+    postNewResponseRequest(text){
+        console.log('postNewResponseRequest text = ', text);
+    }
+
+    confirmRoute(){
+
     }
 
     render() {
         
-        return <Container fluid style={{height : '90vh'}}>
+        return <Container fluid style={{height : '90vh', marginBottom : '4px'}}>
             <Row>
-                <Col 
-                    //large={3}
-                    //md={3}
-                    //sm={4}
-                    xs={3}
-                
-                >
-                    
-                    <Tabs defaultActiveKey="profile" id="uncontrolled-tab-example" style={{marginTop : '12px'}}>
-                        <Tab eventKey="profile" title="MY GHOSTS" style={{marginTop : '12px'}}>
-                            { this.state.myGhosts ? 
-                                <Container>
-                                    <Container fluid style={{paddingRight : 6, paddingLeft : 0}}>
-                                        <Button style={{backgroundColor : colors.primary}} size="lg" block>
-                                            Make A New Ghost!
-                                        </Button>
-                                    </Container>
-                                    
-                                    {this.state.myGhosts.map(ghost => {
-                                        return <Card 
-                                            key={ghost._id}
-                                            onClick={()=>{this.setState({selectedGhost : ghost})}}
-                                            style={this.state.selectedGhost && ghost._id === this.state.selectedGhost._id ? {...styles.ghostCard, backgroundColor : colors.primaryFaded} : styles.ghostCard}>
-                                        <Container>
-                                            <Row>
-                                                <Col style={{...constyles.genH3Text, fontWeight : '200', justifyContent : 'flex-start', textAlign : 'left'}}>
-                                                    {ghost.name}
-                                                </Col>
-                                                <Col style={{...constyles.genH5Text, fontWeight : '200', justifyContent : 'flex-end', textAlign : 'right', alignItems : 'center', marginTop : '7px', marginBottom : '7px'}}>
-                                                <FontAwesomeIcon 
-                                                icon={faEnvelope}
-                                                style={{marginRight : 6, marginTop : 6}}
-                                                color={colors.primary}
-                                                />
-                                                    {ghost.type}
-                                                </Col>
-                                            </Row>
-                                        </Container>
-                                      </Card>
-                                    })}
-                                </Container>
-                            : null }
-                        </Tab>
-                        <Tab eventKey="home" title="FRIENDLY GHOSTS" style={{marginTop : '12px'}}>
-                            a To me, fair friend, you never can be old, For as you were when first your eye I ey'd, Such seems your beauty still. Three winters cold, Have from the forests shook three summers' pride, Three beauteous springs to yellow autumn turn'd, In process of the seasons have I seen, Three April perfumes in three hot Junes burn'd, Since first I saw you fresh, which yet are green. Ah! yet doth beauty like a dial-hand, Steal from his figure, and no pace perceiv'd;
-                        </Tab>
-                    </Tabs>
+                <Col xs={3} >
+                    <GhostScreenGhostListView
+                        socket={this.props.socket}
+                        user={this.props.user}
+                        myGhosts={this.state.myGhosts}
+                        setGhost={this.setGhost}
+                        selectedGhost={this.state.selectedGhost}
+                        scrollHeight="73vh"
+                    />
                 </Col>
-                <Col 
-                    //large={9}
-                    //md={9}
-                    //sm={8}
-                    xs={9}>
-                        { this.state.selectedGhost ? 
+                <Col xs={6}>
+                        { this.state.selectedGhost && this.state.currentChatCard ? 
                             <GhostInteractionView
                                 ghost={this.state.selectedGhost}
                                 user={this.props.user}
                                 socket={this.props.socket}
-                                setGhost={this.state.setGhost}
+                                setGhost={this.setGhost}
+                                setResponseRequestBeingHandled={this.setResponseRequestBeingHandled}
+                                responseRequestBeingHandled={this.state.responseRequestBeingHandled}
+                                currentChatCard={this.state.currentChatCard}
+                                allChatCards={this.state.allChatCards}
+                                newChatCardText={this.state.newChatCardText}
+                                newResponseText={this.state.newResponseText}
+                                chatCardHistory={this.state.chatCardHistory}
+                                submitNewCard={this.submitNewCard}
                             />
                         : null }
                 </Col>
-                
+                <Col xs={3}>
+                    {
+                        this.state.selectedGhost ? 
+                        <MyGhostsChatCardListView 
+                            user={this.props.user}
+                            ghost={this.state.selectedGhost}
+                            chatCards={this.state.chatCards}
+                            socket={this.props.socket}
+                            routingChatCard={this.state.routingChatCard}
+                            setRoutingChatCard={this.setRoutingChatCard}
+                            confirmRoute={this.confirmRoute}
+                            isRouting={this.state.responseRequestBeingHandled}
+                            scrollHeight="73vh"
+                        />
+                        : null
+                    }
+                    
+                </Col>
             </Row>
         </Container>
     };
@@ -114,8 +238,9 @@ class GhostsScreen extends Component {
 
 const styles = {
     ghostCard : { 
-        width: '18rem', 
+        //width: '18rem', 
         marginTop : '8px', 
+        marginRight : '8px',
         cursor: 'pointer' 
     }
 }

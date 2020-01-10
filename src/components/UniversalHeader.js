@@ -97,7 +97,7 @@ class UniversalHeader extends Component {
                             <FontAwesomeIcon 
                                 style={{margin : 'auto', justifyContent : 'center'}}
                                 icon={faUserCircle} 
-                                color={this.props.currentScreen === 'GHOSTS' ? colors.primary : 'black'}
+                                color={this.props.currentScreen === 'PROFILE' ? colors.primary : 'black'}
                             /> 
                             </Row>
                             <Row style={{...constyles.genH6Text, textAlign : 'inherit', justifyContent : 'center'}}>
@@ -111,7 +111,7 @@ class UniversalHeader extends Component {
                             <FontAwesomeIcon 
                                 style={{margin : 'auto', justifyContent : 'center'}}
                                 icon={faCog} 
-                                color={this.props.currentScreen === 'GHOSTS' ? colors.primary : 'black'}
+                                color={this.props.currentScreen === 'SETTINGS' ? colors.primary : 'black'}
                             /> 
                             </Row>
                             <Row style={{...constyles.genH6Text, textAlign : 'inherit', justifyContent : 'center'}}>

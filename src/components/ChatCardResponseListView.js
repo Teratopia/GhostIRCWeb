@@ -21,7 +21,10 @@ class ChatCardResponseListView extends Component {
 
     render() {
         if (this.props.ghost.moderatorIds.includes(this.props.user._id)) {
-            return <Container fluid>
+            return <Container fluid style={{ 
+                paddingBottom : '4px'
+                //backgroundColor : 'purple' 
+                }}>
                 <Row>
                     <Col style={{
                         //backgroundColor : 'pink', 
@@ -43,9 +46,9 @@ class ChatCardResponseListView extends Component {
                                             marginBottom: '0px'
                                         }}
                                         type="text"
-                                        placeholder="Write your own!"
+                                        placeholder="Write your own reply!"
                                         onChange={e => this.setState({newRequestText : e.target.value})}
-                                        defaultValue={this.state.newRequestText}
+                                        //defaultValue={this.state.newRequestText}
                                         value={this.state.newRequestText}
                                     />
                                 </Form.Group>
@@ -96,7 +99,8 @@ class ChatCardResponseListView extends Component {
                     this.props.currentChatCard.responseRequests.map(response => {
                         return <Row key={response._id}>
                             <Card
-                                //onClick={() => { this.setState({ selectedGhost: ghost }) }}
+                                xs={12}
+                                onClick={() => { this.props.responseRowClickHandler(response)}}
                                 style={{ ...styles.cardContainer, backgroundColor: colors.secondaryFaded }}
                             >
                                 <Container>
@@ -114,7 +118,8 @@ class ChatCardResponseListView extends Component {
                     this.props.currentChatCard.responses.map(response => {
                         return <Row key={response._id}>
                             <Card
-                                //onClick={() => { this.setState({ selectedGhost: ghost }) }}
+                                xs={12}
+                                onClick={() => { this.props.responseRowClickHandler(response)}}
                                 style={styles.cardContainer}
                             >
                                 <Container>
@@ -131,7 +136,10 @@ class ChatCardResponseListView extends Component {
 
             </Container>
         } else {
-            return <Container fluid>
+            return <Container fluid style={{ 
+                paddingBottom : '4px'
+                //backgroundColor : 'purple' 
+                }}>>
                 <Row>
                     <Col style={{
                         //backgroundColor : 'pink', 
@@ -204,7 +212,8 @@ class ChatCardResponseListView extends Component {
                     this.props.currentChatCard.responses.map(response => {
                         return <Row key={response._id}>
                             <Card
-                                //onClick={() => { this.setState({ selectedGhost: ghost }) }}
+                                xs={12}
+                                onClick={() => { this.props.responseRowClickHandler(response)}}
                                 style={styles.cardContainer}
                             >
                                 <Container>
@@ -222,7 +231,8 @@ class ChatCardResponseListView extends Component {
                     this.props.currentChatCard.responseRequests.map(response => {
                         return <Row key={response._id}>
                             <Card
-                                //onClick={() => { this.setState({ selectedGhost: ghost }) }}
+                                xs={12}
+                                onClick={() => { this.props.responseRowClickHandler(response)}}
                                 style={{ ...styles.cardContainer, backgroundColor: colors.secondaryFaded }}
                             >
                                 <Container>
