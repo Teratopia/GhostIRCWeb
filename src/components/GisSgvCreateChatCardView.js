@@ -42,7 +42,7 @@ class GisSgvCreateChatCardView extends Component {
         return <Container fluid>
             <Row>
                 <Col>
-                    <Form.Group controlId="newResponseRequestTextInput">
+                    <Form.Group controlId="newResponseRequestTextInput" style={{marginTop : '24px', marginBottom : '12px'}}>
                         <Form.Control
                             as="textarea"
                             placeholder="Write your reply!"

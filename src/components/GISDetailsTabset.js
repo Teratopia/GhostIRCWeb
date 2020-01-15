@@ -3,26 +3,95 @@ import constyles from '../styles/constyles';
 import colors from '../styles/colors';
 import { Button, Row, Container, Col, Badge, Tabs, Tab, Card } from 'react-bootstrap';
 
+import GISChatCardsList from './GISChatCardsList';
+
 class GISDetailsTabset extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            chatCard : null
         }
+        this.selectChatCard = this.selectChatCard.bind(this);
+        this.routeOrJumpHandler = this.routeOrJumpHandler.bind(this);
     }
 
     componentDidMount() {
+
+    }
+
+    componentDidUpdate(prevProps, prevState){
+        if(this.props.chatCards && !this.props.chatCards){
+            this.setState({
+                chatCard : null
+            });
+        } else if (this.props.chatCards && this.props.chatCards !== prevProps.chatCards){
+            let flag = true;
+            for(let i = 0 ; i < this.props.chatCards.length ; i++){
+                if(this.props.chatCards[i]._id === this.state._id){
+                    flag = false;
+                }
+            }
+            if(flag){
+                this.setState({
+                    chatCard : null
+                });
+            }
+        }
     }
 
     componentWillUnmount() {
 
     }
 
+    selectChatCard(chatCard){
+        if(chatCard !== this.state.chatCard){
+            this.setState({
+                chatCard : chatCard
+            });
+        } else {
+            this.setState({
+                chatCard : null
+            });
+        }
+    }
+
+    routeOrJumpHandler(){
+        if(this.state.chatCard){
+            if(this.props.selectedChatCard){
+                this.props.jumpToSelectedChatCard(this.state.chatCard);
+            } else {
+                this.props.routeToSelectedChatCard(this.state.chatCard);
+            }
+        }
+    }
+
     render() {
 
         return <Tabs defaultActiveKey="chatCards">
             <Tab eventKey="chatCards" title="CHAT CARDS">
-                lorem ipsum
+
+                <Button 
+                    size="lg" 
+                    block 
+                    style={{backgroundColor : colors.primary, marginTop : '8px'}}
+                    disabled={!this.state.chatCard}
+                    onClick={this.routeOrJumpHandler}
+                >
+                    {
+                        this.props.selectedChatCard ? 
+                        'Jump To Card'
+                        :
+                        'Route To Card'
+                    }
+                    
+                </Button>   
+
+                <GISChatCardsList
+                    chatCards={this.props.chatCards}
+                    selectedChatCard={this.props.selectedChatCard}
+                    selectChatCard={this.selectChatCard}
+                    localSelection={this.state.chatCard}
+                />
                 
             </Tab>
             <Tab eventKey="details" title="DETAILS">

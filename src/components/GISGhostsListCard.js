@@ -12,9 +12,26 @@ class GISGhostsListCard extends Component {
             hasResponseRequests : false,
             hasFlags : false
         }
+        this.checkFlags = this.checkFlags.bind(this);
     }
 
     componentDidMount() {
+        this.checkFlags();
+    }
+
+    componentDidUpdate(prevProps, prevState){
+        console.log('GISGhostsListCard componentDidUpdate 1');
+        if(prevProps.ghost !== this.props.ghost){
+            console.log('GISGhostsListCard componentDidUpdate 2');
+            this.checkFlags();
+        }
+    }
+
+    componentWillUnmount() {
+
+    }
+
+    checkFlags(){
         if(this.props.ghost && this.props.ghost.chatCards){
             let hasResponseRequestsFlag = false;
             let hasFlagsFlag = false;
@@ -35,10 +52,6 @@ class GISGhostsListCard extends Component {
                 hasFlags : hasFlagsFlag
             })
         }
-    }
-
-    componentWillUnmount() {
-
     }
 
     render() {

@@ -36,7 +36,7 @@ class GisSvgSelectedChatCardView extends Component {
         this.clickForwardCaretHandler = this.clickForwardCaretHandler.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         let downvotes = 0;
         let upvotes = 0;
         let edits = 0;
@@ -84,7 +84,7 @@ class GisSvgSelectedChatCardView extends Component {
                 </Col>
                 <Col xs={10}>
 
-                    <Container style={{ ...constyles.centerContainer, ...constyles.genH2Text, fontWeight: '200' }}>
+                    <Container style={{ ...constyles.centerContainer, ...constyles.genH3Text, fontWeight: '200' }}>
                         {this.props.chatCard ? this.props.chatCard.text : null}
                     </Container>
 

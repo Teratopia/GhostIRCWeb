@@ -23,7 +23,7 @@ class GISGhostsList extends Component {
     }
 
     render() {
-        return <Container fluid>
+        return <Container fluid style={{marginBottom : '40px'}}>
             {this.props.ghosts.map(ghost => {
                 return <GISGhostsListCard
                         key={ghost._id}

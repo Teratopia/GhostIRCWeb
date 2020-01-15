@@ -14,6 +14,7 @@ class GhostsInteractionScreen extends Component {
         this.state = {
             ghosts : [],
             ghost : null,
+            chatCard : null,
             chatCards : null,
             newResponseText : null,
             newChatText : null,
@@ -25,6 +26,9 @@ class GhostsInteractionScreen extends Component {
         this.onSubmitNewChatCardText = this.onSubmitNewChatCardText.bind(this);
         this.selectResponse = this.selectResponse.bind(this);
         this.goBackInChatCardHistory = this.goBackInChatCardHistory.bind(this);
+        this.onCreateGhost = this.onCreateGhost.bind(this);
+        this.jumpToSelectedChatCard = this.jumpToSelectedChatCard.bind(this);
+        this.routeToSelectedChatCard = this.routeToSelectedChatCard.bind(this);
     }
 
     componentWillMount(){
@@ -46,15 +50,19 @@ class GhostsInteractionScreen extends Component {
                     }
                 }
                 for(let i = 0 ; i < ghostsClone.length ; i++){
+                    console.log('for(let i = 0 ; i < ghostsClone.length ; i++){');
                     if(ghostsClone[i]._id === res.req.ghostId){
+                        console.log('ghostsClone[i]._id === res.req.ghostId');
                         ghostsClone[i] = res.ghost;
                         break;
                     }
                 }
             }
+            console.log('ghostsClone 2 = ', ghostsClone);
             this.setState({
                 ghost : res.ghost,
                 chatCard : chatCard,
+                chatCards : res.ghost.chatCards,
                 ghosts : ghostsClone
             })
         });
@@ -71,23 +79,48 @@ class GhostsInteractionScreen extends Component {
                     ghost : res.ghost,
                     ghosts : ghostsClone,
                     chatCard : res.chatCard,
+                    chatCards : res.ghost.chatCards,
                     chatCardHistory : [...this.state.chatCardHistory, res.chatCard]
                 });
             }
         });
         this.props.socket.on('createSprite', res => {
             if(res.success){
-                this.setState({
-                    ghosts : [...this.state.ghosts, res.ghost],
-                    ghost : res.ghost,
-                    chatCardHistory : [res.ghost.baseChatCards[0]],
-                    chatCards : null,
-                    newResponseText : null,
-                    newChatText : null,
-                    responseRequest : null
-                });
+                this.selectGhost(res.ghost);
             }
         });
+        this.props.socket.on('responseRoutedToExistingChatCard', res => {
+            console.log('responseRoutedToExistingChatCard res = ', res);
+            if(res.success){
+                let destChatCard;
+                let originChatCard;
+                res.ghost.chatCards.forEach(cc => {
+                    if(res.req.destinationCCId === cc._id){
+                        destChatCard = cc;
+                    } else if (res.response.originCCId === cc._id){
+                        originChatCard = cc;
+                    }
+                });
+                let ghostsClone = [...this.state.ghosts];
+                for(let i = 0 ; i < ghostsClone.length ; i++){
+                    if(ghostsClone[i]._id === res.req.ghostId){
+                        ghostsClone[i] = res.ghost;
+                        break;
+                    }
+                }
+                let cchClone = [...this.state.chatCardHistory];
+                cchClone.splice(this.state.chatCardHistory.length -1, 1);
+                cchClone.push(originChatCard);
+                cchClone.push(destChatCard);
+                this.setState({
+                    ghost : res.ghost,
+                    ghosts : ghostsClone,
+                    chatCard : destChatCard,
+                    chatCards : res.ghost.chatCards,
+                    chatCardHistory : cchClone
+                })
+            }
+        })
         
         this.props.socket.emit('getAllUserGhostInformationByUserId', {
             userId : this.props.user._id
@@ -109,11 +142,12 @@ class GhostsInteractionScreen extends Component {
 
     selectGhost(ghost){
         if(ghost && ghost.baseChatCards && ghost.baseChatCards.length > 0){
+
             this.setState({
                 ghost : ghost,
                 chatCard : ghost.baseChatCards[0],
                 chatCardHistory : [ghost.baseChatCards[0]],
-                chatCards : null,
+                chatCards : ghost.chatCards,
                 newResponseText : null,
                 newChatText : null,
                 responseRequest : null
@@ -182,13 +216,46 @@ class GhostsInteractionScreen extends Component {
                 chatCard : cchClone[cchClone.length-1]
             });
         }
-        
+    }
+
+    onCreateGhost(){
+        this.setState({
+            ghost : null,
+            chatCard : null,
+            chatCards : null,
+            newResponseText : null,
+            newChatText : null,
+            chatCardHistory : [],
+            responseRequest : null
+        });
+    }
+
+    jumpToSelectedChatCard(chatCard){
+        this.setState({
+            chatCard : chatCard,
+            chatCardHistory : [...this.state.chatCardHistory, chatCard]
+        })
+    }
+
+    routeToSelectedChatCard(chatCard){
+        console.log('routeToSelectedChatCard req = ', {
+            responseId : this.state.responseRequest._id, 
+            destinationCCId : chatCard._id, 
+            userId : this.props.user._id,
+            ghostId : this.state.ghost._id
+        });
+        this.props.socket.emit('routeResponseToExistingChatCard', {
+            responseId : this.state.responseRequest._id, 
+            destinationCCId : chatCard._id, 
+            userId : this.props.user._id,
+            ghostId : this.state.ghost._id
+        });
     }
 
     render() {
         return <Container fluid style={{height : '90vh'}}>
             <Row>
-                <Col sx={3}>
+            <Col xs={3} style={{...styles.scrollableColumn, paddingTop : '12px'}}>
                     <GISGhostsTabset
                         socket={this.props.socket}
                         user={this.props.user}
@@ -198,9 +265,10 @@ class GhostsInteractionScreen extends Component {
                         ghost={this.state.ghost}
                         ghosts={this.state.ghosts}
                         selectGhost={this.selectGhost}
+                        onCreateGhost={this.onCreateGhost}
                     />
                 </Col>
-                <Col xs={6}>
+                <Col xs={6} style={styles.scrollableColumn}>
                     {
                         this.state.ghost ? 
                         <GISSelectedGhostView
@@ -223,17 +291,29 @@ class GhostsInteractionScreen extends Component {
                         />
                     }
                 </Col>
-                <Col xs={3}>
+                <Col xs={3} style={{...styles.scrollableColumn, paddingTop : '12px'}}>
                     <GISDetailsTabset
-                        socket={this.props.socket}
                         user={this.props.user}
-                        state={this.state}
-                        setState={this.setState}
+                        chatCards={this.state.chatCards}
+                        selectedChatCard={this.state.chatCard}
+                        jumpToSelectedChatCard={this.jumpToSelectedChatCard}
+                        routeToSelectedChatCard={this.routeToSelectedChatCard}
                     />
                 </Col>
             </Row>
         </Container>
     };
+}
+
+const styles = {
+    sideColumn : {
+        paddingTop : '12px'
+    },
+    scrollableColumn : {
+        'height': '90vh',
+        'overflow-x': 'hidden',
+        'overflow-y': 'auto',
+    }
 }
 
 export default GhostsInteractionScreen;

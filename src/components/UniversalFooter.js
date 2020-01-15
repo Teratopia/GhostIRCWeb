@@ -18,22 +18,11 @@ class UniversalFooter extends Component {
     }
 
     render() {
-        return <Container fluid style={{
+        return <Container fluid style={{...constyles.centerContainer,
             borderTop : '1px solid '+colors.secondary,
-            
-            //height : '3vh'
-            //backgroundColor : 'yellow'
         }}>
-            <Row>
-                <Col xs={5}>
-
-                </Col>
-                <Col style={{...constyles.genH5Text, marginTop : '6px'}}>
+            <Row style={{...constyles.genH5Text, ...constyles.centerContainer}}>
                     Legal Lorem Ipsum
-                </Col>
-                <Col xs={5}>
-                
-                </Col>
             </Row>
         </Container>
     };

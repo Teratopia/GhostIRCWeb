@@ -25,15 +25,19 @@ class GisSvgResponsesList extends Component {
     }
 
     render() {
-        return <Container fluid>
-            {this.props.responses.map(response => {
-                return <GisSvgResponsesListCard
-                        key={response._id}
-                        response={response}
-                        onClick={this.selectResponse}
-                        />
-            })}
-        </Container>
+        if(!this.props.responses || this.props.responses.length === 0){
+            return null;
+        } else {
+            return <Container fluid style={{padding : '0px', marginBottom : '40px'}}>
+                {this.props.responses.map(response => {
+                    return <GisSvgResponsesListCard
+                            key={response._id}
+                            response={response}
+                            onClick={this.selectResponse}
+                            />
+                })}
+            </Container>
+        }
     };
 }
 

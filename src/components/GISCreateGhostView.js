@@ -205,13 +205,18 @@ class GISCreateGhostView extends Component {
                                 SUBMIT
                             </Button>
                         </Col>
-                        <Col>
+                        {
+                            /*
+<Col>
                             <Button block
                             style={{backgroundColor : colors.secondary}}
                             onClick={()=>this.props.setGhost(null)}>
                                 CANCEL
                             </Button>
                         </Col>
+                            */
+                        }
+                        
                     </Row>
 
                 </Col>

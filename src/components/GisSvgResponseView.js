@@ -42,7 +42,7 @@ class GisSvgResponseView extends Component {
     render() {
         return <Row>
             <Col>
-                <Form.Group controlId="newResponseRequestTextInput">
+                <Form.Group controlId="newResponseRequestTextInput" style={{marginBottom : '8px'}}>
                     <Form.Control
                         type="text"
                         placeholder="Write your own reply!"
@@ -51,7 +51,7 @@ class GisSvgResponseView extends Component {
                     />
                 </Form.Group>
                 {this.state.newRequestText && this.state.newRequestText.length > 0 ?
-                    <Row>
+                    <Row style={{marginBottom: '8px',}}>
                         <Col>
                             <Button
                                 block

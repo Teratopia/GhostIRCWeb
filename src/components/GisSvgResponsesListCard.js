@@ -69,8 +69,7 @@ const styles = {
         marginBottom: '7px' 
     },
     responseCard: {
-        marginTop: '8px',
-        marginRight: '8px',
+        marginBottom: '8px',
         cursor: 'pointer'
     },
 
