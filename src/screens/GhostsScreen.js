@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import GhostInteractionView from '../components/GhostInteractionView';
 import MyGhostsChatCardListView from '../components/MyGhostsChatCardListView';
 import GhostScreenGhostListView from '../components/GhostScreenGhostListView';
+import CreateGhostView from '../components/CreateGhostView';
 
 class GhostsScreen extends Component {
     constructor(props) {
@@ -20,7 +21,8 @@ class GhostsScreen extends Component {
             chatCards : null,
             newResponseText: null,
             currentChatCard: null,
-            chatCardHistory : []
+            chatCardHistory : [],
+            creatingNewGhost : false
         }
         this.setGhost = this.setGhost.bind(this);
         this.setRoutingChatCard = this.setRoutingChatCard.bind(this);
@@ -33,22 +35,22 @@ class GhostsScreen extends Component {
     }
 
     componentDidMount() {
-        this.props.socket.on('getUserGhosts', res => {
-            console.log('getUserGhosts 1, res = ', res);
+        this.props.socket.on('getUserGhostsByUserId', res => {
+            console.log('getUserGhostsByUserId 1, res = ', res);
             if (res.success) {
-                console.log('getUserGhosts success');
+                console.log('getUserGhostsByUserId success');
                 this.setState({myGhosts : res.ghosts});
             } else {
                 console.log(res.message);
             }
         });
-        this.props.socket.emit('getUserGhosts', {
+        this.props.socket.emit('getUserGhostsByUserId', {
             userId : this.props.user._id
         })
-        this.props.socket.on('getAllChatCardForGhostByGhostId', res => {
-            console.log('getAllChatCardForGhostByGhostId res = ', res);
+        this.props.socket.on('getAllDetailedChatCardsForGhostById', res => {
+            console.log('getAllDetailedChatCardsForGhostById res = ', res);
             if (res.success) {
-                console.log('getAllChatCardForGhostByGhostId success');
+                console.log('getAllDetailedChatCardsForGhostById success');
                 this.setState({
                     chatCards: res.chatCards
                 });
@@ -82,30 +84,29 @@ class GhostsScreen extends Component {
                     console.log(' on updateChatCard if');
                     updateObj.chatCardHistory = [...this.state.chatCardHistory, res.chatCard._id];
                 }
+                if(this.state.chatCards && !this.state.chatCards.includes(res.chatCard)){
+                    this.props.socket.emit('getAllDetailedChatCardsForGhostById', {ghostId : this.state.selectedGhost._id});
+                }
                 this.setState(updateObj);
             } else {
                 console.log('updateChatCard error = ', res.message);
             }
         });
-
-        /*
-        this.props.socket.on('getAllChatCardForGhostByGhostId', res => {
-            console.log('getAllChatCardForGhostByGhostId res = ', res);
-            if (res.success) {
-                console.log('getAllChatCardForGhostByGhostId success');
-                //setAllGhostChatCards(res.chatCards);
+        this.props.socket.on('createGhost', res => {
+            console.log('createGhost res = ', res);
+            if(res.success){
+                this.setGhost(res.ghost);
+                this.props.socket.emit('getUserGhostsByUserId', {
+                    userId : this.props.user._id
+                })
             }
-        });
-        */
-
-
+        })
         if (this.props.ghost && this.props.ghost.baseChatCards && this.props.ghost.baseChatCards.length > 0) {
             console.log('props.ghost.baseChatCards[Math.floor(Math.random() * (props.ghost.baseChatCards.length -1))] = ', this.props.ghost.baseChatCards[Math.floor(Math.random() * (this.props.ghost.baseChatCards.length - 1))]);
             this.props.socket.emit('getChatCardById', {
                 chatCardId: this.props.ghost.baseChatCards[Math.floor(Math.random() * (this.props.ghost.baseChatCards.length - 1))]._id
             });
         }
-        //this.props.socket.emit('getAllChatCardForGhostByGhostId', {ghostId : this.props.ghost._id});
     }
 
     componentDidUpdate(prevProps, prevState){
@@ -116,8 +117,10 @@ class GhostsScreen extends Component {
     }
 
     componentWillUnmount() {
-        this.props.socket.removeListener('getUserGhosts');
-        this.props.socket.removeListener('getAllChatCardForGhostByGhostId');
+        //
+        this.props.socket.removeListener('getUserGhostsByUserId');
+        //getAllChatCardForGhostByGhostId
+        this.props.socket.removeListener('getAllDetailedChatCardsForGhostById');
         this.props.socket.removeListener('updateGhost');
         this.props.socket.removeListener('updateChatCard');
     }
@@ -126,17 +129,22 @@ class GhostsScreen extends Component {
         this.setState({responseRequestBeingHandled : null})
     }
 
-    setGhost(ghost){
+    setGhost(ghost, createNew){
         console.log('setGhost ghost = ', ghost);
-        this.setState({
+        let update = {
             selectedGhost : ghost,
             routingChatCard : null,
             responseRequestBeingHandled : null,
             chatCards : null,
             newResponseText: null,
             currentChatCard: null,
-            chatCardHistory : []
-        });
+            chatCardHistory : [],
+            creatingNewGhost : false
+        };
+        if(createNew){
+            update.creatingNewGhost = true;
+        }
+        this.setState(update);
 
         if (ghost && ghost.baseChatCards && ghost.baseChatCards.length > 0) {
             console.log('setGhost if ');
@@ -171,10 +179,26 @@ class GhostsScreen extends Component {
 
     submitNewCard(text){
         console.log('submitNewCard text = ', text);
+        if(text && this.state.responseRequestBeingHandled){
+            var req = {
+                ghostId : this.state.selectedGhost._id,
+                text : text,
+                userId : this.props.user._id,
+                responseId : this.state.responseRequestBeingHandled._id,
+                originChatCardId : this.state.currentChatCard._id
+            };
+            console.log('postNewChatCard req = ', req);
+            this.props.socket.emit('postNewChatCard', req);
+        }
     }
 
     postNewResponseRequest(text){
         console.log('postNewResponseRequest text = ', text);
+        this.props.socket.emit('addResponseRequestToChatCard', {
+            chatCardId : this.state.currentChatCard._id,
+            text : text,
+            userId : this.props.user._id
+        });
     }
 
     confirmRoute(){
@@ -210,8 +234,15 @@ class GhostsScreen extends Component {
                                 newResponseText={this.state.newResponseText}
                                 chatCardHistory={this.state.chatCardHistory}
                                 submitNewCard={this.submitNewCard}
+                                postNewResponseRequest={this.postNewResponseRequest}
                             />
-                        : null }
+                        : this.state.creatingNewGhost ? 
+                            <CreateGhostView 
+                                user={this.props.user}
+                                socket={this.props.socket}
+                                setGhost={this.setGhost}
+                            />
+                    : null}
                 </Col>
                 <Col xs={3}>
                     {

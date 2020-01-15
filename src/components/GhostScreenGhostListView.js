@@ -27,7 +27,9 @@ class GhostsScreenGhostListView extends Component {
         return <Tabs defaultActiveKey="myGhosts" style={{ marginTop: '1rem' }}>
             <Tab eventKey="myGhosts" title="MY GHOSTS">
                 <Container fluid style={{ padding: 8 }}>
-                    <Button style={{ backgroundColor: colors.primary }} size="lg" block>
+                    <Button 
+                    onClick={()=>this.props.setGhost(null, true)}
+                    style={{ backgroundColor: colors.primary }} size="lg" block>
                         Make A New Ghost!
                     </Button>
                 </Container>

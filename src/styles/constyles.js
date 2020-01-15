@@ -74,22 +74,27 @@ export default {
     },
     genH4Text : {
         fontSize : '18px',
-        fontWeight : '500',
+        fontWeight : '400',
         textAlign : 'center'
         //color : colors.secondary,
         //textAlign : 'center'
     },
     genH5Text : {
         fontSize : '14px',
-        fontWeight : '500',
+        fontWeight : '300',
         textAlign : 'center'
         //color : colors.secondary,
         //textAlign : 'center'
     },
     genH6Text : {
         fontSize : '10px',
-        fontWeight : '400',
-        //textAlign : 'center'
+        fontWeight : '200',
+        textAlign : 'center'
         //color : colors.secondary,
     },
+    centerContainer : {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }
 }

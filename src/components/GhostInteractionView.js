@@ -28,6 +28,12 @@ class GhostInteractionView extends Component {
         this.endCardCreation = this.endCardCreation.bind(this);
         this.handleForwardClick = this.handleForwardClick.bind(this);
         this.handleBackwardClick = this.handleBackwardClick.bind(this);
+        this.submitNewCard = this.submitNewCard.bind(this);
+    }
+
+    submitNewCard(text){
+        this.setState({createNewCardMode : false});
+        this.props.submitNewCard(text);
     }
 
     handleBackwardClick() {
@@ -54,7 +60,7 @@ class GhostInteractionView extends Component {
             console.log('this.props.currentChatCard.responses[0]._id = ', this.props.currentChatCard.responses[0]._id);
 
             this.props.socket.emit('getChatCardById',
-                { chatCardId: this.props.currentChatCard.responses[0]._id }
+                { chatCardId: this.props.currentChatCard.responses[0].destinationCCId }
             )
         }
     }
@@ -264,7 +270,7 @@ class GhostInteractionView extends Component {
                             ghost={this.props.ghost}
                             socket={this.props.socket}
                             endCardCreation={this.endCardCreation}
-                            submitNewCard={this.props.submitNewCard}
+                            submitNewCard={this.submitNewCard}
                         />
 
 

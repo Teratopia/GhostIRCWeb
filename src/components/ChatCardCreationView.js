@@ -134,7 +134,7 @@ class ChatCardCreationView extends Component {
                                 disabled={!this.state.newChatCardText || this.state.newChatCardText.length ===0}
                                 block
                                 style={{ backgroundColor: colors.primary, color: 'white' }}
-                                onClick={this.props.submitNewCard(this.state.newChatCardText)}>
+                                onClick={()=>this.props.submitNewCard(this.state.newChatCardText)}>
                                 Submit
                             </Button>
                         </Row>

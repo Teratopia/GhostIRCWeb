@@ -12,13 +12,13 @@ class MyGhostsChatCardListView extends Component {
     }
     
     componentDidMount() {
-        this.props.socket.emit('getAllChatCardForGhostByGhostId', {ghostId : this.props.ghost._id});
+        this.props.socket.emit('getAllDetailedChatCardsForGhostById', {ghostId : this.props.ghost._id});
     }
 
     componentDidUpdate(previousProps, previousState){
         console.log('MyGhostsChatCardListView chatCards new = ', this.props.chatCards)
         if(previousProps.ghost._id !== this.props.ghost._id){
-            this.props.socket.emit('getAllChatCardForGhostByGhostId', {ghostId : this.props.ghost._id});
+            this.props.socket.emit('getAllDetailedChatCardsForGhostById', {ghostId : this.props.ghost._id});
         }
         console.log('this.props.isRouting = ', this.props.isRouting);
     }

@@ -7,6 +7,7 @@ import SearchScreen from './SearchScreen';
 import GhostsScreen from './GhostsScreen';
 import UniversalFooter from '../components/UniversalFooter';
 import UniversalHeader from '../components/UniversalHeader';
+import GhostsInteractionScreen from './GhostsInteractionScreen';
 
 
 class NavigationScreen extends Component {
@@ -72,7 +73,7 @@ class NavigationScreen extends Component {
                 break;
             case 'GHOSTS':
                 console.log('render 2');
-                mainView = <GhostsScreen
+                mainView = <GhostsInteractionScreen
                     socket={this.props.socket}
                     user={this.state.user}
                     setUser={this.setUser}

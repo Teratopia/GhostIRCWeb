@@ -21,7 +21,7 @@ class UniversalHeader extends Component {
     }
 
     render() {
-        return <Container fluid style={{height : '5vh', borderBottom : '1px solid '+colors.secondary}}>
+        return <Container fluid style={{height : '40px', borderBottom : '1px solid '+colors.secondary, paddingTop : '2px'}}>
             <Row>
                 <Col xs={2} style={{justifyContent : 'center', alignItems : 'center'}}>
                     <Row style={{marginTop : '3px'}}>

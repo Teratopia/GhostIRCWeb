@@ -22,6 +22,8 @@ class LoginScreen extends Component {
         this.loginButtonHandler = this.loginButtonHandler.bind(this);
         this.signUpButtonHandler = this.signUpButtonHandler.bind(this);
         this.submitButtonHandler = this.submitButtonHandler.bind(this);
+        this.sendVerificationCodeHandler = this.sendVerificationCodeHandler.bind(this);
+        this.continueAsGuestHandler = this.continueAsGuestHandler.bind(this);
         this.socket = this.props.socket;
     }
 
@@ -42,6 +44,11 @@ class LoginScreen extends Component {
                 this.setState({ code: res.code });
             } else {
                 console.log(res.message);
+            }
+        });
+        this.props.socket.on('completeUserSignUp', res => {
+            if (!res.success) {
+                console.log('completeUserSignUp err = ', res.message);
             }
         });
     }
@@ -70,7 +77,6 @@ class LoginScreen extends Component {
             });
         } else {
             this.setState({ isSigningUp: true });
-            this.props.socket.emit('requestEmailVerification', { email: this.state.email });
         }
     }
 
@@ -90,6 +96,13 @@ class LoginScreen extends Component {
                 username: this.state.username
             });
         }
+    }
+
+    sendVerificationCodeHandler(){
+        this.props.socket.emit('requestEmailVerification', { email: this.state.email });
+    }
+
+    continueAsGuestHandler(){
 
     }
 
@@ -100,7 +113,7 @@ class LoginScreen extends Component {
 
     render() {
 
-        return <Container fluid={true} style={{ 'marginTop': '40px' }}>
+        return <Form style={{ 'marginTop': '40px' }}>
             <Row>
                 <Col>
                 <Row>
@@ -119,7 +132,13 @@ class LoginScreen extends Component {
                 <Col xs={4} />
                 <Col>
                     <Form.Group controlId="formBasicEmail">
-                        <Form.Label>Email Address</Form.Label>
+                        <Form.Label>
+                        {this.state.isSigningUp ?
+                            'Email Address'
+                        :
+                            'Email Address or Username'
+                        }
+                            </Form.Label>
                         <Form.Control
                             type="email"
                             placeholder="Enter Email"
@@ -180,7 +199,7 @@ class LoginScreen extends Component {
                     <Col xs={4} />
                 </Row>
                 : null}
-            {this.state.isSigningUp ?
+            {this.state.isSigningUp && this.state.code ?
                 <Row>
                     <Col xs={4} />
                     <Col>
@@ -204,33 +223,63 @@ class LoginScreen extends Component {
                         <Col>
                             <Button
                                 block
-                                onClick={this.loginButtonHandler}>
+                                onClick={this.loginButtonHandler}
+                                //type={this.state.isSigningUp ? null : "submit"}
+                                style={{backgroundColor : colors.primary}}
+                                >
                                 Log In
                                 </Button>
 
                             <Button
                                 block
-                                onClick={this.signUpButtonHandler}>
+                                onClick={this.signUpButtonHandler}
+                                style={{backgroundColor : colors.tertiary}}
+                                >
                                 Sign Up
-                                </Button>
+                            </Button>
+                            <Button
+                                block
+                                onClick={this.continueAsGuestHandler}
+                                style={{backgroundColor : colors.secondary}}
+                                >
+                                Continue as Guest
+                            </Button>
                         </Col>
                         :
                         <Col>
+                        {
+                            this.state.code ? 
                             <Button block
-                                onClick={this.submitButtonHandler}>
+                                onClick={this.submitButtonHandler}
+                                //type="submit"
+                                style={{backgroundColor : colors.primary}}
+                                >
                                 Submit
-                                </Button>
+                            </Button>
+                            :
+                            <Button block
+                                onClick={this.sendVerificationCodeHandler}
+                                //type="submit"
+                                style={{backgroundColor : colors.primary}}
+                                disabled={!this.state.email}
+                                >
+                                Send Verification Code Email
+                            </Button>
+                        }
+                            
 
                             <Button
                                 block
-                                onClick={this.signUpButtonHandler}>
+                                onClick={this.signUpButtonHandler}
+                                style={{backgroundColor : colors.secondary}}
+                                >
                                 Cancel
                                 </Button>
                         </Col>
                 }
                 <Col xs={4} />
             </Row>
-        </Container>
+        </Form>
         //return <h1>test</h1>
         /*
         return <div style={styles.centerContainer}>

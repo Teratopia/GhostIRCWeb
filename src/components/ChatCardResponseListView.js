@@ -85,7 +85,10 @@ class ChatCardResponseListView extends Component {
                                     <Button
                                         style={{ backgroundColor: colors.primary, color: 'white' }}
                                         block
-                                        onClick={() => { this.props.postNewResponseRequest(this.state.newRequestText) }}>
+                                        onClick={() => { 
+                                            this.setState({newRequestText : ''});
+                                            this.props.postNewResponseRequest(this.state.newRequestText)
+                                        }}>
                                         Submit!
                             </Button>
                                 </Col>

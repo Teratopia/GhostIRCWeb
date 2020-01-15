@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
 
-class CreateGhostView extends Component {
+class GISCreateGhostView extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -44,7 +44,7 @@ class CreateGhostView extends Component {
     }
 
     postGhost(){
-        this.props.socket.emit('createGhost', {
+        this.props.socket.emit('createSprite', {
             userId : this.props.user._id,
             name : this.state.ghostName,
             type : this.state.ghostType,
@@ -220,4 +220,4 @@ class CreateGhostView extends Component {
     };
 }
 
-export default CreateGhostView;
+export default GISCreateGhostView;
