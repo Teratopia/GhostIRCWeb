@@ -36,12 +36,12 @@ class GISGhostsListCard extends Component {
             let hasResponseRequestsFlag = false;
             let hasFlagsFlag = false;
             this.props.ghost.chatCards.forEach(chatCard => {
-                if(!this.state.hasResponseRequests 
+                if(!hasResponseRequestsFlag
                     && chatCard.responseRequests 
                     && chatCard.responseRequests.length > 0){
                     hasResponseRequestsFlag = true;
                 }
-                if(!this.state.hasFlags 
+                if(!hasFlagsFlag
                     && chatCard.chatCardFlags 
                     && chatCard.chatCardFlags.length > 0){
                     hasFlagsFlag = true;

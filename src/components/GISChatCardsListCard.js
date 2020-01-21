@@ -31,23 +31,36 @@ class GISChatCardsListCard extends Component {
             totalsString: null,
             voteTotals: 0,
             numEdits: 0,
-            numFlags: 0
+            numFlags: 0,
+            doubleClicking : false
         }
+        this.onClickCard = this.onClickCard.bind(this);
     }
 
     componentDidMount() {
+        console.log('chat card list card componentDidMount 1');
         let downvotes = 0;
         let upvotes = 0;
         let edits = 0;
         let flags = 0;
+        console.log('chat card list card componentDidMount 2 this.props.chatCard = ', this.props.chatCard);
         if (this.props.chatCard) {
-            this.props.chatCard.ratings.forEach(rating => {
+            this.props.chatCard.chatCardRatings.forEach(rating => {
                 rating.isDownvote ? downvotes++ : upvotes++;
             });
             this.props.chatCard.flags.forEach(flag => {
                 flag.flagType === 'FLAG' ? flags++ : edits++;
             })
         }
+        console.log('chat card list card componentDidMount 3');
+        console.log('chat card list card componentDidMount, state = ', {
+            upvoteString: abbreviateNumber(upvotes),
+            downvoteString: abbreviateNumber(downvotes),
+            totalsString : abbreviateNumber(upvotes - downvotes),
+            voteTotals : upvotes - downvotes,
+            numEdits: edits,
+            numFlags: flags,
+        });
         this.setState({
             upvoteString: abbreviateNumber(upvotes),
             downvoteString: abbreviateNumber(downvotes),
@@ -58,18 +71,45 @@ class GISChatCardsListCard extends Component {
         });
     }
 
-    componentDidMount() {
-
+    componentDidUpdate(prevProps){
+        console.log('chat card list card componentDidUpdate 1');
+        if(this.props !== prevProps){
+            console.log('chat card list card componentDidUpdate 2');
+            this.componentDidMount();
+        }
     }
 
     componentWillUnmount() {
 
     }
 
+    onClickCard(chatCard) {
+        console.log('onClickCard 1');
+        if(!this.state.doubleClicking){
+            console.log('onClickCard this.state.doubleClicking = ', this.state.doubleClicking); 
+            this.props.onClick(chatCard);
+            this.setState({
+                doubleClicking : true
+            });
+            var that = this;
+            setTimeout(() => {
+                console.log('onClickCard setTimeout that.doubleClicking = ', that.state.doubleClicking);
+                that.setState({
+                    doubleClicking : false
+                });
+            }, 333, that);
+        } else {
+            console.log('onClickCard 2');
+            console.log('onClickCard this.state.doubleClicking = ', this.state.doubleClicking); 
+            this.props.onDoubleClick(chatCard);
+        }
+        
+    }
+
     render() {
         return <Card
             key={this.props.chatCard._id}
-            onClick={() => { this.props.onClick(this.props.chatCard) }}
+            onClick={() => { this.onClickCard(this.props.chatCard) }}
             style={this.props.chatCard
                 && this.props.chatCard._id === this.props.selectedChatCardId ?
                 { ...styles.chatCardCard, backgroundColor: colors.primaryFaded }
@@ -105,7 +145,7 @@ class GISChatCardsListCard extends Component {
                             <FontAwesomeIcon
                                 style={styles.iconStyle}
                                 icon={this.state.voteTotals >= 0 ? faArrowUp : faArrowDown}
-                                color={colors.tertiary}
+                                color={this.state.voteTotals >= 0 ? colors.primary : colors.danger}
                             />
                             <span style={styles.detailText}>
                                 {this.state.voteTotals}

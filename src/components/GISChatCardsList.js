@@ -34,6 +34,7 @@ class GISChatCardsList extends Component {
                             selectedChatCardId={this.props.selectedChatCard ? this.props.selectedChatCard._id : null}
                             localSelectedChatCardId={this.props.localSelection ? this.props.localSelection._id : null}
                             onClick={this.selectChatCard}
+                            onDoubleClick={this.props.doubleClickCard}
                             />
                 })}
             </Container>

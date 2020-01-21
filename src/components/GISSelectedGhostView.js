@@ -13,21 +13,29 @@ class GISSelectedGhostView extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            filterString : null
         }
         this.onSubmitNewResponseText = this.onSubmitNewResponseText.bind(this);
         this.selectResponse = this.selectResponse.bind(this);
         this.onSubmitNewChatCardText = this.onSubmitNewChatCardText.bind(this);
         this.clickBackCaretHandler = this.clickBackCaretHandler.bind(this);
         this.clickForwardCaretHandler = this.clickForwardCaretHandler.bind(this);
+        this.setFilterString = this.setFilterString.bind(this);
     }
 
     componentDidMount() {
 
     }
 
-    componentDidUpdate() {
-
+    componentDidUpdate(prevProps, prevState) {
+        console.log('GISSelectedGhostView componentDidUpdate');
+        if(this.props.chatCard !== prevProps.chatCard
+            || this.props.ghost !== prevProps.ghost){
+                this.setState({
+                    filterString : null
+                });
+                this.render();
+            }
     }
 
     componentWillUnmount() {
@@ -63,10 +71,20 @@ class GISSelectedGhostView extends Component {
         }
     }
 
+    setFilterString(string){
+        this.setState({
+            filterString : string
+        });
+    }
+
     render() {
         return <Container fluid style={{ height: '90vh' }}>
             <GisSgvHeader
                 ghost={this.props.ghost}
+                socket={this.props.socket}
+                user={this.props.user}
+                onSearchScreen={this.props.onSearchScreen}
+                nullifySelectedGhost={this.props.nullifySelectedGhost}
             />
             {
                 this.props.chatCard ?
@@ -77,11 +95,17 @@ class GISSelectedGhostView extends Component {
                             clickForwardCaretHandler={this.clickForwardCaretHandler}
                             clickBackCaretHandler={this.clickBackCaretHandler}
                             chatCardHistory={this.props.chatCardHistory}
+                            ghost={this.props.ghost}
+                            socket={this.props.socket}
+                            user={this.props.user}
                         />
 
                         <GisSvgResponseView
                             chatCard={this.props.chatCard}
                             onSubmitNewText={this.onSubmitNewResponseText}
+                            filterString={this.state.filterString}
+                            setFilterString={this.setFilterString}
+                            
                         />
                 
                         <GisSvgResponsesList
@@ -91,6 +115,10 @@ class GISSelectedGhostView extends Component {
                                 this.props.chatCard.responses 
                             }
                             selectResponse={this.selectResponse}
+                            filterString={this.state.filterString}
+                            ghost={this.props.ghost}
+                            socket={this.props.socket}
+                            user={this.props.user}
                         />
 
                         <GisSvgResponsesList
@@ -100,6 +128,10 @@ class GISSelectedGhostView extends Component {
                                 this.props.chatCard.responseRequests 
                             }
                             selectResponse={this.selectResponse}
+                            filterString={this.state.filterString}
+                            ghost={this.props.ghost}
+                            socket={this.props.socket}
+                            user={this.props.user}
                         />
 
                     </Container>

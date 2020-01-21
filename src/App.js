@@ -17,17 +17,10 @@ class App extends Component {
     };
     
     this.socket = io('http://127.0.0.1:1212', {jsonp : false});
-    this.socket.on('getDetailedChatCardById', res => {
-      console.log('getDetailedChatCardById res = ', res);
-    })
     this.socket.on('connect', () => {
       console.log('CONNECTION SUCCESSFUL');
       this.render();
       });
-      this.socket.emit('getDetailedChatCardById', {
-        chatCardId : '5e19147ee97bb79805426e81'
-      })
-    
   }
 
   componentDidMount() {

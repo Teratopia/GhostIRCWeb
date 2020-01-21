@@ -20,14 +20,10 @@ class GISDetailsTabset extends Component {
     }
 
     componentDidUpdate(prevProps, prevState){
-        if(this.props.chatCards && !this.props.chatCards){
-            this.setState({
-                chatCard : null
-            });
-        } else if (this.props.chatCards && this.props.chatCards !== prevProps.chatCards){
+        if (this.state.chatCard && this.props.chatCards && this.props.chatCards !== prevProps.chatCards){
             let flag = true;
             for(let i = 0 ; i < this.props.chatCards.length ; i++){
-                if(this.props.chatCards[i]._id === this.state._id){
+                if(this.props.chatCards[i]._id === this.state.chatCard._id){
                     flag = false;
                 }
             }
@@ -90,6 +86,7 @@ class GISDetailsTabset extends Component {
                     chatCards={this.props.chatCards}
                     selectedChatCard={this.props.selectedChatCard}
                     selectChatCard={this.selectChatCard}
+                    doubleClickCard={this.props.jumpToSelectedChatCard}
                     localSelection={this.state.chatCard}
                 />
                 

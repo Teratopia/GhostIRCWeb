@@ -21,12 +21,14 @@ class GisSvgResponseView extends Component {
         this.setState({
             newRequestText : e.target.value
         });
+        this.props.setFilterString(e.target.value);
     }
 
     cancelButtonHandler(){
         this.setState({ 
             newRequestText: '' 
-        })
+        });
+        this.props.setFilterString(null);
     }
 
     submitButtonHandler(){
@@ -42,7 +44,7 @@ class GisSvgResponseView extends Component {
     render() {
         return <Row>
             <Col>
-                <Form.Group controlId="newResponseRequestTextInput" style={{marginBottom : '8px'}}>
+                <Form.Group controlId="newResponseRequestTextInput" style={{marginBottom : '8px', marginTop : '4px'}}>
                     <Form.Control
                         type="text"
                         placeholder="Write your own reply!"

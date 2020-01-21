@@ -24,7 +24,10 @@ class NavigationScreen extends Component {
     }
 
     componentDidMount() {
-
+        this.props.socket.on('updateUser', res => {
+            console.log('updateUser res = ', res);
+            this.setUser(res.user);
+        });
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -46,6 +49,7 @@ class NavigationScreen extends Component {
     componentWillUnmount() {
         this.props.socket.removeListener('loginUser');
         this.props.socket.removeListener('requestEmailVerification');
+        this.props.socket.removeListener('updateUser');
     }
 
     render() {
@@ -76,7 +80,6 @@ class NavigationScreen extends Component {
                 mainView = <GhostsInteractionScreen
                     socket={this.props.socket}
                     user={this.state.user}
-                    setUser={this.setUser}
                     setCurrentScreen={this.setCurrentScreen}
                     currentScreen={this.state.currentScreen}
                     pnToken="test"

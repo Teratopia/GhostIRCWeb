@@ -19,10 +19,13 @@ class LoginScreen extends Component {
             confCode: null
 
         }
-        this.loginButtonHandler = this.loginButtonHandler.bind(this);
+        this.loginHandler = this.loginHandler.bind(this);
         this.signUpButtonHandler = this.signUpButtonHandler.bind(this);
-        this.submitButtonHandler = this.submitButtonHandler.bind(this);
+        this.completeSubmitHandler = this.completeSubmitHandler.bind(this);
         this.sendVerificationCodeHandler = this.sendVerificationCodeHandler.bind(this);
+        this.submitHandler = this.submitHandler.bind(this);
+
+
         this.continueAsGuestHandler = this.continueAsGuestHandler.bind(this);
         this.socket = this.props.socket;
     }
@@ -36,6 +39,9 @@ class LoginScreen extends Component {
                 this.props.setCurrentScreen('SEARCH');
             } else {
                 console.log(res.message);
+                if(!this.state.isSigningUp){
+                    this.signUpButtonHandler();
+                }
             }
         });
         this.props.socket.on('requestEmailVerification', res => {
@@ -57,7 +63,8 @@ class LoginScreen extends Component {
         //console.log('setState this.state = ', this.state);
     }
 
-    loginButtonHandler() {
+    loginHandler() {
+        console.log('loginButtonHandler 1');
         if (this.state.email && this.state.password) {
             this.props.socket.emit('loginUser', {
                 email: this.state.email,
@@ -68,6 +75,7 @@ class LoginScreen extends Component {
     }
 
     signUpButtonHandler() {
+        console.log('signUpButtonHandler 1');
         if (this.state.isSigningUp) {
             this.setState({
                 isSigningUp: false,
@@ -80,7 +88,7 @@ class LoginScreen extends Component {
         }
     }
 
-    submitButtonHandler() {
+    completeSubmitHandler() {
         console.log('submitButtonHandler 1');
         if (this.state.email &&
             this.state.username &&
@@ -99,6 +107,7 @@ class LoginScreen extends Component {
     }
 
     sendVerificationCodeHandler(){
+        console.log('sendVerificationCodeHandler 1');
         this.props.socket.emit('requestEmailVerification', { email: this.state.email });
     }
 
@@ -109,6 +118,18 @@ class LoginScreen extends Component {
     componentWillUnmount() {
         this.props.socket.removeListener('loginUser');
         this.props.socket.removeListener('requestEmailVerification');
+    }
+
+    submitHandler() {
+        if(this.state.isSigningUp){
+            if(this.state.code){
+                this.completeSubmitHandler();
+            } else {
+                this.sendVerificationCodeHandler();
+            }
+        } else {
+            this.loginHandler();
+        }
     }
 
     render() {
@@ -223,8 +244,8 @@ class LoginScreen extends Component {
                         <Col>
                             <Button
                                 block
-                                onClick={this.loginButtonHandler}
-                                //type={this.state.isSigningUp ? null : "submit"}
+                                onClick={this.submitHandler}
+                                type={!this.state.isSigningUp ? "submit" : "button"}
                                 style={{backgroundColor : colors.primary}}
                                 >
                                 Log In
@@ -250,8 +271,9 @@ class LoginScreen extends Component {
                         {
                             this.state.code ? 
                             <Button block
-                                onClick={this.submitButtonHandler}
+                                onClick={this.completeSubmitHandler}
                                 //type="submit"
+                                //type={this.state.isSigningUp && this.state.code ? "submit" : "button"}
                                 style={{backgroundColor : colors.primary}}
                                 >
                                 Submit
@@ -259,7 +281,7 @@ class LoginScreen extends Component {
                             :
                             <Button block
                                 onClick={this.sendVerificationCodeHandler}
-                                //type="submit"
+                                //type={this.state.isSigningUp && !this.state.code ? "submit" : "button"}
                                 style={{backgroundColor : colors.primary}}
                                 disabled={!this.state.email}
                                 >

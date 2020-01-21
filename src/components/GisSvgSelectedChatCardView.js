@@ -1,10 +1,12 @@
 import React, { Component, useImperativeHandle } from 'react';
 import constyles from '../styles/constyles';
 import colors from '../styles/colors';
-import { Button, Row, Container, Col, Form } from 'react-bootstrap';
-import { faAngleLeft, faAngleRight, faArrowUp, faArrowDown, faFlag, faPenNib, faEdit } from '@fortawesome/free-solid-svg-icons'
+import { Button, Row, Container, Col, Form, Modal } from 'react-bootstrap';
+import { faAngleLeft, faAngleRight, faArrowUp, faArrowDown, faFlag, faPenNib, faEdit, faArrowCircleUp, faArrowCircleDown, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from 'moment';
+import DeleteChatCardModal from '../modals/DeleteChatCardModal';
+import AddBibliographyModal from '../modals/AddBibliographyModal';
 
 function abbreviateNumber(value) {
     var newValue = value;
@@ -30,10 +32,17 @@ class GisSvgSelectedChatCardView extends Component {
             upvoteString: null,
             downvoteString: null,
             numEdits: 0,
-            numFlags: 0
+            numFlags: 0,
+            hasUpvoted : false,
+            hasDownvoted : false,
+            showDeleteModal : false,
+            showBibliographyModal : false
         }
         this.clickBackCaretHandler = this.clickBackCaretHandler.bind(this);
         this.clickForwardCaretHandler = this.clickForwardCaretHandler.bind(this);
+        this.clickUpvoteHandler = this.clickUpvoteHandler.bind(this);
+        this.clickDownvoteHandler = this.clickDownvoteHandler.bind(this);
+        this.confirmDelete = this.confirmDelete.bind(this);
     }
 
     componentDidMount() {
@@ -41,20 +50,33 @@ class GisSvgSelectedChatCardView extends Component {
         let upvotes = 0;
         let edits = 0;
         let flags = 0;
+        let hasUpvoted = false;
+        let hasDownvoted = false;
         if (this.props.chatCard) {
-            this.props.chatCard.ratings.forEach(rating => {
+            this.props.chatCard.chatCardRatings.forEach(rating => {
                 rating.isDownvote ? downvotes++ : upvotes++;
+                if(rating.userId === this.props.user._id){
+                    rating.isDownvote ? hasDownvoted = true : hasUpvoted = true;
+                }
             });
             this.props.chatCard.flags.forEach(flag => {
                 flag.flagType === 'FLAG' ? flags++ : edits++;
-            })
+            });
         }
         this.setState({
             upvoteString: abbreviateNumber(upvotes),
             downvoteString: abbreviateNumber(downvotes),
             numEdits: edits,
-            numFlags: flags
+            numFlags: flags,
+            hasUpvoted : hasUpvoted,
+            hasDownvoted : hasDownvoted
         });
+    }
+
+    componentDidUpdate(prevProps){
+        if(this.props !== prevProps){
+            this.componentDidMount();
+        }
     }
 
     componentWillUnmount() {
@@ -67,6 +89,38 @@ class GisSvgSelectedChatCardView extends Component {
 
     clickForwardCaretHandler() {
         this.props.clickForwardCaretHandler();
+    }
+
+    clickUpvoteHandler() {
+        this.props.socket.emit('rateChatCard', {
+            userId : this.props.user._id,
+            chatCardId : this.props.chatCard._id,
+            isUpvote : true,
+            isDownvote : false,
+            ghostId : this.props.chatCard.ghostId
+        });
+    }
+
+    clickDownvoteHandler() {
+        this.props.socket.emit('rateChatCard', {
+            userId : this.props.user._id,
+            chatCardId : this.props.chatCard._id,
+            isUpvote : false,
+            isDownvote : true,
+            ghostId : this.props.chatCard.ghostId
+        });
+    }
+
+    confirmDelete() {
+        console.log('confirmDelete 1');
+        this.props.socket.emit('deleteChatCard', {
+            userId : this.props.user._id,
+            chatCardId : this.props.chatCard._id,
+            ghostId : this.props.chatCard.ghostId
+        });
+        this.setState({
+            showDeleteModal : false
+        });
     }
 
     render() {
@@ -104,24 +158,75 @@ class GisSvgSelectedChatCardView extends Component {
             </Row>
             <Row>
                 <Col xs={3}>
-                    <Row style={{...constyles.centerContainer, justifyContent : 'flex-start', ...constyles.genH4Text, textAlign : 'right'}}>
-                        <FontAwesomeIcon
-                            icon={faArrowUp}
-                            color={colors.secondary}
-                            style={styles.detailIcon}
-                        />
-                        <span style={styles.detailText}>
-                            {this.state.upvoteString}
-                        </span>
-                        <FontAwesomeIcon
-                            icon={faArrowDown}
-                            color={colors.secondary}
-                            style={styles.detailIcon}
-                        />
-                        <span style={styles.detailText}>
-                            {this.state.downvoteString}
-                        </span>
-                    </Row>
+                    {
+                        this.props.user._id === this.props.chatCard.creatorId ?
+                        this.props.ghost.baseChatCardIds.includes(this.props.chatCard._id) ?
+                        <Row style={{...constyles.centerContainer, justifyContent : 'flex-start', ...constyles.genH4Text, textAlign : 'right'}}>
+                            <FontAwesomeIcon
+                                icon={faArrowUp}
+                                color={colors.primary}
+                                style={{...styles.detailIcon}}
+                            />
+                            <span style={styles.detailText}>
+                                {this.state.upvoteString}
+                            </span>
+                            <FontAwesomeIcon
+                                icon={faArrowDown}
+                                color={colors.danger}
+                                style={{...styles.detailIcon}}
+                            />
+                            <span style={styles.detailText}>
+                                {this.state.downvoteString}
+                            </span>
+                        </Row>
+                        :
+                        <Row style={{...constyles.centerContainer, justifyContent : 'flex-start', ...constyles.genH4Text, textAlign : 'right'}}>
+                            <FontAwesomeIcon
+                                icon={faTrash}
+                                style={{...styles.detailIcon, cursor: 'pointer'}}
+                                color={colors.secondary}
+                                onClick={() => { this.setState({ showDeleteModal : true }) }}
+                            />
+                            <FontAwesomeIcon
+                                icon={faArrowUp}
+                                color={colors.primary}
+                                style={{...styles.detailIcon}}
+                            />
+                            <span style={styles.detailText}>
+                                {this.state.upvoteString}
+                            </span>
+                            <FontAwesomeIcon
+                                icon={faArrowDown}
+                                color={colors.danger}
+                                style={{...styles.detailIcon}}
+                            />
+                            <span style={styles.detailText}>
+                                {this.state.downvoteString}
+                            </span>
+                        </Row>
+                        :
+                        <Row style={{...constyles.centerContainer, justifyContent : 'flex-start', ...constyles.genH4Text, textAlign : 'right'}}>
+                            <FontAwesomeIcon
+                                icon={this.state.hasUpvoted ? faArrowCircleUp : faArrowUp}
+                                color={this.state.hasUpvoted ? colors.primary : colors.secondary}
+                                style={{...styles.detailIcon, cursor: 'pointer'}}
+                                onClick={this.clickUpvoteHandler}
+                            />
+                            <span style={styles.detailText}>
+                                {this.state.upvoteString}
+                            </span>
+                            <FontAwesomeIcon
+                                icon={this.state.hasDownvoted ? faArrowCircleDown : faArrowDown}
+                                color={this.state.hasDownvoted ? colors.danger : colors.secondary}
+                                style={{...styles.detailIcon, cursor: 'pointer'}}
+                                onClick={this.clickDownvoteHandler}
+                            />
+                            <span style={styles.detailText}>
+                                {this.state.downvoteString}
+                            </span>
+                        </Row>
+                    }
+                    
                 </Col>
                 <Col xs={6}>
                     <Container style={{ ...constyles.centerContainer, ...constyles.genH6Text, fontWeight: '100' }}>
@@ -151,7 +256,8 @@ class GisSvgSelectedChatCardView extends Component {
                         <FontAwesomeIcon
                             icon={faPenNib}
                             color={colors.secondary}
-                            style={styles.detailIcon}
+                            style={{...styles.detailIcon, cursor: 'pointer'}}
+                            onClick={() => this.setState({ showBibliographyModal : true })}
                         />
                         <span style={styles.detailText}>
                         {this.props.chatCard.bibliography.length}
@@ -159,6 +265,18 @@ class GisSvgSelectedChatCardView extends Component {
                     </Row>
                 </Col>
             </Row>
+
+            <DeleteChatCardModal
+                showDeleteModal={this.state.showDeleteModal}
+                hideDeleteModal={() => { this.props.setState({ showDeleteModal : false }) }}
+                confirmDelete={this.confirmDelete}
+            />
+
+            <AddBibliographyModal
+                showModal={this.state.showBibliographyModal}
+                hideModal={() => this.setState({ showBibliographyModal : false })}
+            />
+
         </Container>
 
 
@@ -172,7 +290,8 @@ const styles = {
     },
     detailIcon : {
         marginLeft : '4px', 
-        marginRight : '4px'
+        marginRight : '4px',
+        //cursor: 'pointer'
     },
     detailText : {
         ...constyles.centerContainer, 
